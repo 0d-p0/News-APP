@@ -97,6 +97,7 @@ async function createPostHelper() {
             image: image_url,
             publishDate: pubDate,
             description: postdetails,
+            fullDescription:content,
           });
           console.log("loop run 3");
           // res.send("new post added")
@@ -113,7 +114,7 @@ async function createPostHelper() {
 exports.createPost = async (req, res) => {
   try {
     createPostHelper();
-    setInterval(() => createPostHelper(), 5 * 60 * 1000);
+    setInterval(() => createPostHelper(), 10 * 60 * 1000);
 
     res.json({
       message: "creating post process start",

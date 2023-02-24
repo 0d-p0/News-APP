@@ -13,6 +13,7 @@ const blog = require("./Routes/blog");
 const autoFetcher = require("./Routes/autofetch");
 
 const { connectDatabase } = require("./config/ConnectMongo");
+const axios = require("axios");
 
 connectDatabase();
 
@@ -29,7 +30,12 @@ app.use("/", blog);
 app.use("/", autoFetcher);
 app.use("/", postRoute);
 
+function callEvery13min(){
+  axios.get('https://short-news-backend.onrender.com').then(console.log("run")).catch(error=>console.log(error.message))
+}
+
 app.get("/", async (req, res) => {
+  setInterval(callEvery13min,1*60*1000)
   res.send("hello dev");
 });
 
