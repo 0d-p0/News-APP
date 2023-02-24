@@ -35,7 +35,7 @@ function callEvery13min(){
 }
 
 app.get("/", async (req, res) => {
-  setInterval(callEvery13min,1*60*1000)
+  setInterval(callEvery13min,14*60*1000)
   res.send("hello dev");
 });
 
