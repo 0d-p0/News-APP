@@ -13,23 +13,29 @@ function convertDateTomilliseconds(date) {
 }
 
 const configuration = new Configuration({
-  apiKey:process.env.my_api_key ,
+  apiKey: process.env.my_api_key,
 });
 const openai = new OpenAIApi(configuration);
 
 async function summarizePost(post) {
-  
   const prompt = `summarize the text : ${post} under 100 words`;
 
   const response = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt: prompt,
-    temperature: 0,
-    max_tokens: 1024,
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "user",
+        content: ` ${post}.\n\nTl;dr`,
+      },
+    ],
+    // model: "text-davinci-003",
+    // prompt: prompt,
+    // temperature: 0,
+    // max_tokens: 1024,
   });
 
   //   console.log(response.data.choices[0].text);
-  return response.data.choices[0].text;
+  return response.data.choices[0].message.content;
 }
 
 exports.getAllPosts = async (req, res) => {
@@ -97,7 +103,7 @@ async function createPostHelper() {
             image: image_url,
             publishDate: pubDate,
             description: postdetails,
-            fullDescription:content,
+            fullDescription: content,
           });
           console.log("loop run 3");
           // res.send("new post added")
@@ -165,5 +171,30 @@ exports.deletePosts = async (req, res) => {
     res.json(500).json({
       message: error.message,
     });
+  }
+};
+
+exports.tests = async (req, res) => {
+  try {
+    const post = req.body;
+
+    // const prompt = `summarize the text : ${post} under 100 words`;
+    //  message:[{"role":"user",
+    // "content":`summarize the text : ${post} under 100 words`
+    // }]
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "user",
+          content: ` ${req.body}.\n\nTl;dr`,
+        },
+      ],
+    });
+    console.log(completion.data.choices[0].message);
+    res.send(completion.data.choices[0].message.content);
+  } catch (error) {
+    console.log(error);
+    res.send(error.message);
   }
 };
