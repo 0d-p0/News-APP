@@ -5,6 +5,10 @@ const cheerio = require("cheerio");
 const { Configuration, OpenAIApi } = require("openai");
 const PostDetails = require("../Model/Post");
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function convertDateTomilliseconds(date) {
   const dateString = date;
   const dateObj = new Date(dateString);
@@ -60,8 +64,8 @@ async function createPostHelper() {
     const feed = await parser.parseURL("https://www.gadgets360.com/rss/news");
     const allPost = await PostDetails.findOne().sort({ publishDate: "desc" });
 
-    // filter top 5 posts from feed
-    const topTenPosts = feed.items.slice(0, 5);
+    // filter top 10 posts from feed
+    const topTenPosts = feed.items.slice(0, 10);
 
     for (let index = 0; index < topTenPosts.length; index++) {
       const post = topTenPosts[index];
@@ -103,6 +107,8 @@ async function createPostHelper() {
                 fullDescription: content,
               });
             });
+           
+            sleep(6000)
 
             console.log("new post created ",headline);
           }
