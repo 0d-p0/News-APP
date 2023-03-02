@@ -11,7 +11,6 @@ router.route('/getposts').get(getAllPosts)
 router.route('/deleteposts').get(deletePosts)
 
 
-router.route('/ronti').get(tests)
 
 
 module.exports = router

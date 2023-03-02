@@ -70,7 +70,6 @@ async function createPostHelper() {
     for (let index = 0; index < topTenPosts.length; index++) {
       const post = topTenPosts[index];
       const postUrl = post.guid;
-      console.log("publish date", post.pubDate);
       const pubDate = convertDateTomilliseconds(post.pubDate);
       if (allPost?.publishDate >= pubDate) {
         console.log("alredy fetched");
@@ -176,28 +175,5 @@ exports.deletePosts = async (req, res) => {
     res.json(500).json({
       message: error.message,
     });
-  }
-};
-
-exports.tests = async (req, res) => {
-  try {
-    const post = req.body;
-    // const completion = await openai.createChatCompletion({
-    //   model: "gpt-3.5-turbo",
-    //   messages: [
-    //     {
-    //       role: "user",
-    //       content: ` ${req.body}.\n\nTl;dr`,
-    //     },
-    //   ],
-    // });
-    // console.log(completion.data.choices[0].message);
-
-    const postdetails = await summarizePost(post);
-
-    res.send(postdetails);
-  } catch (error) {
-    console.log(error);
-    res.send(error.message);
   }
 };
