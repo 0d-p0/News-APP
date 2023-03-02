@@ -19,7 +19,6 @@ const openai = new OpenAIApi(configuration);
 
 async function summarizePost(post) {
   // const prompt = `summarize the text : ${post} under 100 words`;
-      console.log(post)
   try {
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
@@ -30,13 +29,11 @@ async function summarizePost(post) {
         },
       ],
     });
-  
-  
+
     return response.data.choices[0].message.content;
   } catch (error) {
-    console.error(error.message)
+    console.error(error.message);
   }
-
 }
 
 exports.getAllPosts = async (req, res) => {
@@ -61,17 +58,15 @@ async function createPostHelper() {
   try {
     console.log("loop run");
     const feed = await parser.parseURL("https://www.gadgets360.com/rss/news");
-    const isoDate = feed.items[0].pubDate;
-    // const post = feed.items[0];
-    // const postUrl = post.guid;
-    // const pubDate = convertDateTomilliseconds(post.pubDate);
     const allPost = await PostDetails.findOne().sort({ publishDate: "desc" });
 
-    const topTenPosts = feed.items.slice(0, 10);
+    // filter top 5 posts from feed
+    const topTenPosts = feed.items.slice(0, 5);
 
     for (let index = 0; index < topTenPosts.length; index++) {
       const post = topTenPosts[index];
       const postUrl = post.guid;
+      console.log("publish date", post.pubDate);
       const pubDate = convertDateTomilliseconds(post.pubDate);
       if (allPost?.publishDate >= pubDate) {
         console.log("alredy fetched");
@@ -98,19 +93,18 @@ async function createPostHelper() {
               content = content.replace($(this).text(), "");
             });
             // here post is summerize
-            const postdetails = await summarizePost(content);
-            // create full post
-            const fullPost = await PostDetails.create({
-              title: headline,
-              image: image_url,
-              publishDate: pubDate,
-              description: postdetails,
-              fullDescription: content,
+            await summarizePost(content).then((postdetails) => {
+              // create full post
+              PostDetails.create({
+                title: headline,
+                image: image_url,
+                publishDate: pubDate,
+                description: postdetails,
+                fullDescription: content,
+              });
             });
-            console.log("loop run 3");
-            // res.send("new post added")
-            // return fullPost;
-            // console.log("Content: ", content);
+
+            console.log("new post created ",headline);
           }
         });
       }
@@ -179,8 +173,6 @@ exports.deletePosts = async (req, res) => {
   }
 };
 
-
-
 exports.tests = async (req, res) => {
   try {
     const post = req.body;
@@ -194,9 +186,9 @@ exports.tests = async (req, res) => {
     //   ],
     // });
     // console.log(completion.data.choices[0].message);
-   
-    const postdetails = await summarizePost(post)
-   
+
+    const postdetails = await summarizePost(post);
+
     res.send(postdetails);
   } catch (error) {
     console.log(error);
