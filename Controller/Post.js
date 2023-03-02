@@ -18,24 +18,25 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 async function summarizePost(post) {
-  const prompt = `summarize the text : ${post} under 100 words`;
+  // const prompt = `summarize the text : ${post} under 100 words`;
+      console.log(post)
+  try {
+    const response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "user",
+          content: ` ${post}.\n\nTl;dr`,
+        },
+      ],
+    });
+  
+  
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error(error.message)
+  }
 
-  const response = await openai.createCompletion({
-    model: "gpt-3.5-turbo",
-    messages: [
-      {
-        role: "user",
-        content: ` ${post}.\n\nTl;dr`,
-      },
-    ],
-    // model: "text-davinci-003",
-    // prompt: prompt,
-    // temperature: 0,
-    // max_tokens: 1024,
-  });
-
-  //   console.log(response.data.choices[0].text);
-  return response.data.choices[0].message.content;
 }
 
 exports.getAllPosts = async (req, res) => {
@@ -57,64 +58,68 @@ exports.getAllPosts = async (req, res) => {
 };
 
 async function createPostHelper() {
-  console.log("loop run");
-  const feed = await parser.parseURL("https://www.gadgets360.com/rss/news");
-  const isoDate = feed.items[0].pubDate;
-  // const post = feed.items[0];
-  // const postUrl = post.guid;
-  // const pubDate = convertDateTomilliseconds(post.pubDate);
-  const allPost = await PostDetails.findOne().sort({ publishDate: "desc" });
+  try {
+    console.log("loop run");
+    const feed = await parser.parseURL("https://www.gadgets360.com/rss/news");
+    const isoDate = feed.items[0].pubDate;
+    // const post = feed.items[0];
+    // const postUrl = post.guid;
+    // const pubDate = convertDateTomilliseconds(post.pubDate);
+    const allPost = await PostDetails.findOne().sort({ publishDate: "desc" });
 
-  const topTenPosts = feed.items.slice(0, 10);
+    const topTenPosts = feed.items.slice(0, 10);
 
-  for (let index = 0; index < topTenPosts.length; index++) {
-    const post = topTenPosts[index];
-    const postUrl = post.guid;
-    const pubDate = convertDateTomilliseconds(post.pubDate);
-    if (allPost?.publishDate >= pubDate) {
-      console.log("alredy fetched");
-      // res.send("alredy fetched")
-      break;
-    } else {
-      request(postUrl, async function (error, response, html) {
-        if (!error && response.statusCode == 200) {
-          const $ = cheerio.load(html);
+    for (let index = 0; index < topTenPosts.length; index++) {
+      const post = topTenPosts[index];
+      const postUrl = post.guid;
+      const pubDate = convertDateTomilliseconds(post.pubDate);
+      if (allPost?.publishDate >= pubDate) {
+        console.log("alredy fetched");
+        // res.send("alredy fetched")
+        break;
+      } else {
+        request(postUrl, async function (error, response, html) {
+          if (!error && response.statusCode == 200) {
+            const $ = cheerio.load(html);
 
-          const headline = $("h1").text();
-          const image_tag = $("div.heroimg img");
-          const image_url = image_tag.attr("src");
+            const headline = $("h1").text();
+            const image_tag = $("div.heroimg img");
+            const image_url = image_tag.attr("src");
 
-          let content = $(".content_text").text();
+            let content = $(".content_text").text();
 
-          const dontInclude = $(".alsoseewgt");
-          const emphasis = $("em");
+            const dontInclude = $(".alsoseewgt");
+            const emphasis = $("em");
 
-          dontInclude.each(function (i, elem) {
-            content = content.replace($(this).text(), "");
-          });
-          emphasis.each(function (i, elem) {
-            content = content.replace($(this).text(), "");
-          });
-          // here post is summerize
-          const postdetails = await summarizePost(content);
-          // create full post
-          const fullPost = await PostDetails.create({
-            title: headline,
-            image: image_url,
-            publishDate: pubDate,
-            description: postdetails,
-            fullDescription: content,
-          });
-          console.log("loop run 3");
-          // res.send("new post added")
-          // return fullPost;
-          // console.log("Content: ", content);
-        }
-      });
+            dontInclude.each(function (i, elem) {
+              content = content.replace($(this).text(), "");
+            });
+            emphasis.each(function (i, elem) {
+              content = content.replace($(this).text(), "");
+            });
+            // here post is summerize
+            const postdetails = await summarizePost(content);
+            // create full post
+            const fullPost = await PostDetails.create({
+              title: headline,
+              image: image_url,
+              publishDate: pubDate,
+              description: postdetails,
+              fullDescription: content,
+            });
+            console.log("loop run 3");
+            // res.send("new post added")
+            // return fullPost;
+            // console.log("Content: ", content);
+          }
+        });
+      }
     }
-  }
 
-  console.log("...end....");
+    console.log("...end....");
+  } catch (error) {
+    console.error(error.message);
+  }
 }
 
 exports.createPost = async (req, res) => {
@@ -174,25 +179,25 @@ exports.deletePosts = async (req, res) => {
   }
 };
 
+
+
 exports.tests = async (req, res) => {
   try {
     const post = req.body;
-
-    // const prompt = `summarize the text : ${post} under 100 words`;
-    //  message:[{"role":"user",
-    // "content":`summarize the text : ${post} under 100 words`
-    // }]
-    const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "user",
-          content: ` ${req.body}.\n\nTl;dr`,
-        },
-      ],
-    });
-    console.log(completion.data.choices[0].message);
-    res.send(completion.data.choices[0].message.content);
+    // const completion = await openai.createChatCompletion({
+    //   model: "gpt-3.5-turbo",
+    //   messages: [
+    //     {
+    //       role: "user",
+    //       content: ` ${req.body}.\n\nTl;dr`,
+    //     },
+    //   ],
+    // });
+    // console.log(completion.data.choices[0].message);
+   
+    const postdetails = await summarizePost(post)
+   
+    res.send(postdetails);
   } catch (error) {
     console.log(error);
     res.send(error.message);
