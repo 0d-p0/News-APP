@@ -34,9 +34,7 @@ function callEvery13min(){
   axios.get('https://short-news-backend.onrender.com').then(console.log("run")).catch(error=>console.log(error.message))
 }
 
-app.get("/run",(req,res)=>{
-  res.send("okkk")
-})
+
 
 app.get("/", async (req, res) => {
   console.log("server run")
