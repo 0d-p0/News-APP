@@ -23,21 +23,21 @@ const openai = new OpenAIApi(configuration);
 
 async function summarizePost(post) {
   // const prompt = `summarize the text : ${post} under 100 words`;
-  try {
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "user",
-          content: ` ${post}.\n\nTl;dr`,
-        },
-      ],
-    });
+  // try {
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "user",
+        content: ` ${post}.\n\nTl;dr`,
+      },
+    ],
+  });
 
-    return response.data.choices[0].message.content;
-  } catch (error) {
-    console.error(error.message);
-  }
+  return response.data.choices[0].message.content;
+  // } catch (error) {
+  //   console.error(error.message);
+  // }
 }
 
 async function reWritePost(post) {
@@ -85,6 +85,7 @@ async function createPostHelper() {
       const post = topTenPosts[index];
       const postUrl = post.guid;
       const pubDate = convertDateTomilliseconds(post.pubDate);
+
       if (allPost?.publishDate >= pubDate) {
         console.log("alredy fetched");
         // res.send("alredy fetched")
@@ -112,8 +113,8 @@ async function createPostHelper() {
             // here post is summerize
             const postdetails = await summarizePost(content);
             //.then((postdetails) => {
-             
-            const repost=await reWritePost(content)
+
+            const repost = await reWritePost(content);
 
             // create full post
             await PostDetails.create({
@@ -125,12 +126,13 @@ async function createPostHelper() {
             });
             //});
 
-            sleep(6000);
-
             console.log("new post created ", headline);
+           
           }
         });
       }
+
+    await  sleep(30000);
     }
 
     console.log("...end....");
