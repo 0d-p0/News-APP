@@ -40,6 +40,20 @@ async function summarizePost(post) {
   }
 }
 
+async function reWritePost(post) {
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "user",
+        content: `rewrite the text : ${post}`,
+      },
+    ],
+  });
+
+  return response.data.choices[0].message.content;
+}
+
 exports.getAllPosts = async (req, res) => {
   try {
     const allPosts = await PostDetails.find().sort({ publishDate: "desc" });
@@ -96,20 +110,24 @@ async function createPostHelper() {
               content = content.replace($(this).text(), "");
             });
             // here post is summerize
-            await summarizePost(content).then((postdetails) => {
-              // create full post
-              PostDetails.create({
-                title: headline,
-                image: image_url,
-                publishDate: pubDate,
-                description: postdetails,
-                fullDescription: content,
-              });
-            });
-           
-            sleep(6000)
+            const postdetails = await summarizePost(content);
+            //.then((postdetails) => {
+             
+            const repost=await reWritePost(content)
 
-            console.log("new post created ",headline);
+            // create full post
+            await PostDetails.create({
+              title: headline,
+              image: image_url,
+              publishDate: pubDate,
+              description: postdetails,
+              fullDescription: repost,
+            });
+            //});
+
+            sleep(6000);
+
+            console.log("new post created ", headline);
           }
         });
       }
@@ -176,4 +194,18 @@ exports.deletePosts = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+exports.tests = async (req, res) => {
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "user",
+        content: `rewrite the text : ${post}`,
+      },
+    ],
+  });
+
+  res.send(response.data.choices[0].message.content);
 };
