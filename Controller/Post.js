@@ -46,7 +46,7 @@ async function reWritePost(post) {
     messages: [
       {
         role: "user",
-        content: `rewrite the text : ${post}`,
+        content: `rewrite this as a long article : ${post}`,
       },
     ],
   });
@@ -112,7 +112,7 @@ async function createPostHelper() {
             });
             // here post is summerize
             const postdetails = await summarizePost(content);
-            //.then((postdetails) => {
+          
 
             const repost = await reWritePost(content);
 
@@ -122,9 +122,9 @@ async function createPostHelper() {
               image: image_url,
               publishDate: pubDate,
               description: postdetails,
-              fullDescription: repost,
+              fullDescription: repost.trimStart(),
             });
-            //});
+          
 
             console.log("new post created ", headline);
            
