@@ -6,6 +6,8 @@ const postSchema = new Schema({
   description: { type: String, required: true },
   fullDescription: { type: String, required: true },
   image: { type: String, required: true },
+  originalPost:{type: String, required: true },
+  originalPostBy:{type: String, required: true },
   publishDate: { type: Number, required: true  }
 });
 
