@@ -33,7 +33,7 @@ app.use("/", postRoute);
 
 app.get("/", async (req, res) => {
   console.log("server run")
-  res.send("hello dev"+process.env.password);
+  res.send("hello dev");
 });
 
 
