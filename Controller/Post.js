@@ -278,8 +278,17 @@ exports.deletePosts = async (req, res) => {
 
 exports.tests = async (req, res) => {
   try {
-    gizchinaCreatePostHelper();
-    res.send("okkkkkkkkkkkkkk");
+   
+    const allPost = await PostDetails.findOne({originalPostBy:"gizchin "}).sort({ publishDate: "desc" });
+
+
+    if(allPost?.publishDate){
+      console.log("on")
+    }else{
+      console.log("offffffff")
+    }
+
+    res.send(allPost);
   } catch (error) {
     console.log(error.message);
     res.send("error");
