@@ -279,7 +279,7 @@ exports.deletePosts = async (req, res) => {
 exports.tests = async (req, res) => {
   try {
    
-    const allPost = await PostDetails.findOne({originalPostBy:"gizchin "}).sort({ publishDate: "desc" });
+    const allPost = await PostDetails.findOne({originalPostBy:"gizchina"}).sort({ publishDate: "desc" });
 
 
     if(allPost?.publishDate){
