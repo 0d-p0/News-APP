@@ -30,16 +30,10 @@ app.use("/", blog);
 app.use("/", autoFetcher);
 app.use("/", postRoute);
 
-function callEvery13min(){
-  axios.get('https://short-news-backend.onrender.com').then(console.log("run")).catch(error=>console.log(error.message))
-}
-
-
-
 
 app.get("/", async (req, res) => {
   console.log("server run")
-  res.send("hello dev");
+  res.send("hello dev"+process.env.password);
 });
 
 
