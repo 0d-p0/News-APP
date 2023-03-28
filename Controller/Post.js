@@ -296,3 +296,13 @@ exports.tests = async (req, res) => {
 };
 
 
+exports.test22 = async()=>{
+  gadgets360CreatePostHelper().then(gizchinaCreatePostHelper);
+
+  setInterval(
+    () => gadgets360CreatePostHelper().then(gizchinaCreatePostHelper),
+    10 * 60 * 1000
+  );
+}
+
+

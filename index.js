@@ -14,7 +14,7 @@ const autoFetcher = require("./Routes/autofetch");
 
 const { connectDatabase } = require("./config/ConnectMongo");
 const axios = require("axios");
-const { createPost } = require("./Controller/Post");
+const { test22 } = require("./Controller/Post");
 
 connectDatabase();
 
@@ -34,8 +34,8 @@ app.use("/", postRoute);
 
 app.get("/", async (req, res) => {
   console.log("server run")
-  createPost()
- // res.send("hello dev");
+  test22()
+  res.send("hello dev");
 });
 
 
