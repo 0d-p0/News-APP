@@ -222,9 +222,9 @@ async function gadgets360CreatePostHelper() {
 
 exports.createPost = async (req, res) => {
   try {
-    cron.schedule("*/5 * * * *", () => {
+  //  cron.schedule("*/5 * * * *", () => {
       gadgets360CreatePostHelper().then(gizchinaCreatePostHelper);
-    });
+    // });
 
     res.json({
       message: "creating post process start",
@@ -296,3 +296,5 @@ exports.tests = async (req, res) => {
     res.send("error");
   }
 };
+
+
