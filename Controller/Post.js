@@ -3,6 +3,7 @@ const parser = new Parser();
 const request = require("request");
 const cheerio = require("cheerio");
 const axios = require("axios");
+const cron = require("node-cron");
 const { Configuration, OpenAIApi } = require("openai");
 const PostDetails = require("../Model/Post");
 const { json } = require("body-parser");
@@ -80,7 +81,9 @@ async function gizchinaCreatePostHelper() {
   try {
     console.log("loop run - gizchina");
     const feed = await parser.parseURL("https://www.gizchina.com/feed/");
-    const allPost = await PostDetails.findOne({originalPostBy:"gizchina"}).sort({ publishDate: "desc" });
+    const allPost = await PostDetails.findOne({
+      originalPostBy: "gizchina",
+    }).sort({ publishDate: "desc" });
 
     // filter top 10 posts from feed
     const topTenPosts = feed.items.slice(0, 10);
@@ -122,7 +125,7 @@ async function gizchinaCreatePostHelper() {
           const imageTag = $("img.attachment-presso_thumbnail_large");
           const image_url = imageTag.attr("src");
 
-          const repost = await reWritePost(content);
+          //  const repost = await reWritePost(content);
           const summerize = await summarizePost(content);
 
           await PostDetails.create({
@@ -130,7 +133,7 @@ async function gizchinaCreatePostHelper() {
             image: image_url,
             publishDate: pubDate,
             description: summerize,
-            fullDescription: repost.trimStart(),
+            //   fullDescription: repost.trimStart(),
             originalPost: postUrl,
             originalPostBy: "gizchina",
           });
@@ -151,7 +154,9 @@ async function gadgets360CreatePostHelper() {
   try {
     console.log("loop run - gadgets 360");
     const feed = await parser.parseURL("https://www.gadgets360.com/rss/news");
-    const allPost = await PostDetails.findOne({originalPostBy:"gadgets360"}).sort({ publishDate: "desc" });
+    const allPost = await PostDetails.findOne({
+      originalPostBy: "gadgets360",
+    }).sort({ publishDate: "desc" });
 
     // filter top 10 posts from feed
     const topTenPosts = feed.items.slice(0, 10);
@@ -188,7 +193,7 @@ async function gadgets360CreatePostHelper() {
             // here post is summerize
             const postdetails = await summarizePost(content);
 
-            const repost = await reWritePost(content);
+          //  const repost = await reWritePost(content);
 
             // create full post
             await PostDetails.create({
@@ -196,7 +201,7 @@ async function gadgets360CreatePostHelper() {
               image: image_url,
               publishDate: pubDate,
               description: postdetails,
-              fullDescription: repost.trimStart(),
+         //     fullDescription: repost.trimStart(),
               originalPost: postUrl,
               originalPostBy: "gadgets360",
             });
@@ -217,12 +222,9 @@ async function gadgets360CreatePostHelper() {
 
 exports.createPost = async (req, res) => {
   try {
-    gadgets360CreatePostHelper().then(gizchinaCreatePostHelper);
-
-    setInterval(
-      () => gadgets360CreatePostHelper().then(gizchinaCreatePostHelper),
-      10 * 60 * 1000
-    );
+    cron.schedule("*/5 * * * *", () => {
+      gadgets360CreatePostHelper().then(gizchinaCreatePostHelper);
+    });
 
     res.json({
       message: "creating post process start",
@@ -278,14 +280,14 @@ exports.deletePosts = async (req, res) => {
 
 exports.tests = async (req, res) => {
   try {
-   
-    const allPost = await PostDetails.findOne({originalPostBy:"gizchina"}).sort({ publishDate: "desc" });
+    const allPost = await PostDetails.findOne({
+      originalPostBy: "gizchina",
+    }).sort({ publishDate: "desc" });
 
-
-    if(allPost?.publishDate){
-      console.log("on")
-    }else{
-      console.log("offffffff")
+    if (allPost?.publishDate) {
+      console.log("on");
+    } else {
+      console.log("offffffff");
     }
 
     res.send(allPost);
@@ -294,15 +296,3 @@ exports.tests = async (req, res) => {
     res.send("error");
   }
 };
-
-
-exports.test22 = async()=>{
-  gadgets360CreatePostHelper().then(gizchinaCreatePostHelper);
-
-  setInterval(
-    () => gadgets360CreatePostHelper().then(gizchinaCreatePostHelper),
-    10 * 60 * 1000
-  );
-}
-
-
