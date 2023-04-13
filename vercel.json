@@ -7,7 +7,7 @@
     "crons": [
       {
         "path": "/createpost",
-        "schedule": "*/5 * * * *"
+        "schedule": "0 22 * * *"
       }
     ]
   
