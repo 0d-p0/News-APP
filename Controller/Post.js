@@ -63,12 +63,14 @@ exports.getAllPosts = async (req, res) => {
   try {
     const allPosts = await PostDetails.find().sort({ publishDate: "desc" });
 
-    res.json([
-      {
-        allPosts,
-        success: true,
-      },
-    ]);
+    res.send(allPosts)
+
+    // res.json([
+    //   {
+    //     allPosts,
+    //     success: true,
+    //   },
+    // ]);
   } catch (error) {
     res.status(500).json({
       success: false,
