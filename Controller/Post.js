@@ -283,7 +283,7 @@ exports.deletePosts = async (req, res) => {
 exports.allCateGories = async (req, res) => {
   try {
     const categories = await PostDetails.distinct("categories");
-    res.send(categories);
+    res.send({categories});
   } catch (error) {
     res.status(500).json({
       success: false,
