@@ -16,7 +16,7 @@
   "crons": [
     {
       "path": "/deleteposts",
-      "schedule": "10 23 * * *"
+      "schedule": "48 5 * * *"
     }
   ]
 }
