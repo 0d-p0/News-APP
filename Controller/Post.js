@@ -63,7 +63,7 @@ exports.getAllPosts = async (req, res) => {
   try {
     const allPosts = await PostDetails.find().sort({ publishDate: "desc" });
 
-    res.send(allPosts)
+    res.send(allPosts);
 
     // res.json([
     //   {
@@ -195,7 +195,7 @@ async function gadgets360CreatePostHelper() {
             // here post is summerize
             const postdetails = await summarizePost(content);
 
-          //  const repost = await reWritePost(content);
+            //  const repost = await reWritePost(content);
 
             // create full post
             await PostDetails.create({
@@ -203,7 +203,7 @@ async function gadgets360CreatePostHelper() {
               image: image_url,
               publishDate: pubDate,
               description: postdetails,
-         //     fullDescription: repost.trimStart(),
+              //     fullDescription: repost.trimStart(),
               originalPost: postUrl,
               originalPostBy: "gadgets360",
             });
@@ -224,8 +224,8 @@ async function gadgets360CreatePostHelper() {
 
 exports.createPost = async (req, res) => {
   try {
-  //  cron.schedule("*/5 * * * *", () => {
-      gadgets360CreatePostHelper().then(gizchinaCreatePostHelper);
+    //  cron.schedule("*/5 * * * *", () => {
+    gadgets360CreatePostHelper().then(gizchinaCreatePostHelper);
     // });
 
     res.json({
@@ -268,10 +268,17 @@ async function deletePostHelper() {
 
 exports.deletePosts = async (req, res) => {
   try {
-    deletePostHelper();
-    setInterval(() => deletePostHelper(), 48 * 60 * 60 * 1000);
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 2); // Subtract 2 days from the current date
+
+    // Delete posts older than the cutoff date
+    const response = await PostDetails.deleteMany({
+      publishDate: { $lt: cutoffDate },
+    });
+
+    console.log(response);
     res.status(200).json({
-      message: "deleting process start",
+      message: response,
     });
   } catch (error) {
     res.json(500).json({
@@ -283,7 +290,7 @@ exports.deletePosts = async (req, res) => {
 exports.allCateGories = async (req, res) => {
   try {
     const categories = await PostDetails.distinct("categories");
-    res.send({categories});
+    res.send({ categories });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -310,5 +317,3 @@ exports.tests = async (req, res) => {
     res.send("error");
   }
 };
-
-
