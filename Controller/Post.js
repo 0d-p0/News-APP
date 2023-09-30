@@ -61,7 +61,10 @@ async function reWritePost(post) {
 
 exports.getAllPosts = async (req, res) => {
   try {
-    const allPosts = await PostDetails.find().sort({ publishDate: "desc" });
+    const { targetDate } = req.body;
+    const allPosts = await PostDetails.find({
+      createdAt: { $gt: targetDate },
+    }).sort({ publishDate: "desc" });
 
     res.send(allPosts);
 
