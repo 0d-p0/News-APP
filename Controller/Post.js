@@ -62,9 +62,13 @@ async function reWritePost(post) {
 exports.getAllPosts = async (req, res) => {
   try {
     const { targetDate } = req.body;
-    const allPosts = await PostDetails.find({
-      createdAt: { $gt: targetDate },
-    }).sort({ publishDate: "desc" });
+    const query = targetDate
+      ? { createdAt: { $gt: targetDate } } // Filter by date if targetDate is provided
+      : {};
+      
+    const allPosts = await PostDetails.find(query).sort({
+      publishDate: "desc",
+    });
 
     res.send(allPosts);
 
