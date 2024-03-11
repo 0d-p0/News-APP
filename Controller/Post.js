@@ -274,18 +274,18 @@ async function deletePostHelper() {
 
 exports.deletePosts = async (req, res) => {
   try {
-    // const cutoffDate = new Date();
-    // cutoffDate.setDate(cutoffDate.getDate() - 2); // Subtract 2 days from the current date
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 2); // Subtract 2 days from the current date
 
-    // // Delete posts older than the cutoff date
-    // const response = await PostDetails.deleteMany({
-    //   publishDate: { $lt: cutoffDate },
-    // });
+    // Delete posts older than the cutoff date
+    const response = await PostDetails.deleteMany({
+      publishDate: { $lt: cutoffDate },
+    });
 
-    // console.log(response);
-    // res.status(200).json({
-    //   message: response,
-    // });
+    console.log(response);
+    res.status(200).json({
+      message: response,
+    });
   } catch (error) {
     res.json(500).json({
       message: error.message,
